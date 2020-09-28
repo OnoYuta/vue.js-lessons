@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>条件付きレンダリング</title>
+</head>
+<body>
+    <div id="app">
+        <!-- 在庫切れの場合 -->
+        <div v-if="stock == 0">売り切れです</div>
+        <!-- 在庫がある場合 -->
+        <div v-else>{{ price }}円</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                price: 0,
+                stock: 0
+            }
+        });
+        app.price = 1000;
+        app.stock = 10;
+        // デベロッパツールのコンソールに`app.stock = 0`と入力すると表示が変わる
+    </script>
+</body>
+</html>
