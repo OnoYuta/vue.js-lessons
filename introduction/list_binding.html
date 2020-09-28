@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>リストバインディング</title>
+</head>
+<body>
+    <div id="app">
+        <ul>
+            <!-- リストバインディングを使えば配列要素が増えてもHTML記述量は増えないのですっきり書ける -->
+            <li v-for="item in items">{{ item.name }}：{{ item.name }}</li>
+        </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                items: [
+                    {name: '商品1', price: 1000},
+                    {name: '商品2', price: 2000},
+                    {name: '商品2', price: 3000},
+                ]
+            }
+        });
+    </script>
+</body>
+</html>
