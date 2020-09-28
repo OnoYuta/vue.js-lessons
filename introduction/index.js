@@ -1,6 +1,7 @@
 var app = new Vue({ 
     el: '#app',
     data: {
-        message: 'Hello Vue!'
+        price: 0
     }
 });
+app.price = 1000;
