@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/bootstrap.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../filter/bootstrap.css">
     <script src="../js/vue.js"></script>
     <title>Introduction</title>
 </head>
@@ -12,7 +11,7 @@
     <div class="container">
         <div id="app">
             <!-- {{ プロパティ名 | フィルタ名 }}でフィルタを適用できる -->
-            <p>{{ price | number_format }}</p>
+            <p class='text-info'>{{ price | number_format }}</p>
             <!-- v-bind:属性名="プロパティ名 | フィルタ名"でバインドしたデータにフィルタを適用できる -->
             <form action="">
                 <p>
