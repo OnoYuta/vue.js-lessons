@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="vue.js"></script>
+    <title>Introduction</title>
+</head>
+<body>
+    <div id="app">
+        <!-- プロパティのバインディング -->
+        <p>{{ message }}</p>
+        <!-- 三項演算子による制御 -->
+        <p>{{ lang == 'ja' ? message_ja : message_en }}</p>
+        <form action="" method="post">
+            <!-- v-bind:属性名='プロパティ名'で属性をバインドできる -->
+            <input type="text" name="text" v-bind:value="message">
+        </form>
+        <!-- v-bind:style="{CSSプロパティ（キャメルケース）:Vueコンポーネントプロパティ}"でスタイルをバインドする -->
+        <p v-bind:style="{fontSize: pSize}">文字サイズは{{ pSize }}です</p>
+        <!-- v-bind:class="{class名: calss名を出力する条件式}"でクラスをバインドする -->
+        <p v-bind:class="{capitalize: isCapital}">hello vue!</p>
+        <table border='1'>
+            <tr>
+                <th>商品コード</th>
+                <th>商品名</th>
+            </tr>
+            <!-- 各々の配列要素を区別できる値(ここではcode)をkey属性でバインドすることが推奨される -->
+            <tr v-for="item in products" v-bind:key="item.code">
+                <td>{{ item.code }}</td>
+                <td>{{ item.name }}</td>
+            </tr>
+        </table>
+        <!-- <要素名 v-if="条件式">出力内容</要素名>で条件式成立の場合のみ表示する -->
+        <p v-if="price < 1000">セール実施中</p>
+        <p v-else-if="price > 1000">原材料高騰につき値上げ</p>
+        <p v-else>定価</p>
+        <!-- 広範囲をまとめて切り替えたいときはtemplateタグを使用する -->
+        <template v-if="price < 1000">
+            <p>大特価の{{ price }}円で好評販売中！</p>
+            <p>10周年記念の限定特別セールです！！</p>
+        </template>
+        <!-- v-showで条件式が成立する場合のみ表示する -->
+        <!-- v-ifと違いDOMには必ず出力されdisplay: none;スタイルが適用される -->
+        <p v-show="price > 1000">価格が1000円以上です。</p>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
