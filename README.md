@@ -88,3 +88,156 @@ Vueクラスのコンストラクタは、引数にObjectを受け取る。Vue�
 | computed   | コンポーネントが持つ算出プロパティを定義する                 |
 | watch      | コンポーネントが持つウォッチャを定義する                     |
 
+### レンダリング
+
+HTMLテキスト内にマスタッシュで囲んでプロパティ名を記述すると`{{ プロパティ名 }}`、コンポーネントのdataオプションに定義したプロパティの値が出力される。dataが更新されると、HTMLテキストも自動的に置き換わる。
+
+#### テキストにバインドする
+
+```html
+<!-- プロパティのバインディング -->
+<p>{{ message }}</p>
+```
+
+#### 三項演算子を使った出力
+
+```html
+<!-- 三項演算子による制御 -->
+<p>{{ lang == 'ja' ? message_ja : message_en }}</p>
+```
+
+#### 属性にバインドする
+
+```html
+<form action="" method="post">
+    <!-- v-bind:属性名='プロパティ名'で属性をバインドできる -->
+    <input type="text" name="text" v-bind:value="message">
+</form>
+```
+
+#### スタイルにバインドする
+
+```html
+<!-- v-bind:style="{CSSプロパティ（キャメルケース）:Vueコンポーネントプロパティ}"でスタイルをバインドする -->
+<p v-bind:style="{fontSize: pSize}">文字サイズは{{ pSize }}です</p>
+```
+
+#### クラスにバインドする
+
+```html
+<!-- v-bind:class="{class名: calss名を出力する条件式}"でクラスをバインドする -->
+<p v-bind:class="{capitalize: isCapital}">hello vue!</p>
+```
+
+#### 配列を出力する
+
+v-bind:keyがなくても表示できるが、要素を削除した場合に各要素のプロパティがバラバラになってしまう。
+
+```html
+<table border='1'>
+    <tr>
+        <th>商品コード</th>
+        <th>商品名</th>
+    </tr>
+    <!-- 各々の配列要素を区別できる値(ここではcode)をkey属性でバインドすることが推奨される -->
+    <tr v-for="item in products" v-bind:key="item.code">
+        <td>{{ item.code }}</td>
+        <td>{{ item.name }}</td>
+    </tr>
+</table>
+```
+
+#### 条件式で表示・非表示を切り替える
+
+if文を使用した切り替え
+
+```html
+<!-- <要素名 v-if="条件式">出力内容</要素名>で条件式成立の場合のみ表示する -->
+<p v-if="price < 1000">セール実施中</p>
+<p v-else-if="price > 1000">原材料高騰につき値上げ</p>
+<p v-else>定価</p>
+```
+
+複数行をまとめて扱いたいときは`template`タグを使用する
+
+```html
+<!-- 広範囲をまとめて切り替えたいときはtemplateタグを使用する -->
+<template v-if="price < 1000">
+    <p>大特価の{{ price }}円で好評販売中！</p>
+    <p>10周年記念の限定特別セールです！！</p>
+</template>
+```
+
+v-showを使用した切り替え（非表示時は`dispaly: none;`が適用された上でDOMに出力される）
+
+```html
+<!-- v-showで条件式が成立する場合のみ表示する -->
+<!-- v-ifと違いDOMには必ず出力されdisplay: none;スタイルが適用される -->
+<p v-show="price > 1000">価格が1000円以上です。</p>
+```
+
+### フィルター
+
+`price=1000`と数値型で格納された値を、表示のときだけ`1,000円`と整形したいときなどにフィルタを使用する
+
+#### グローバルスコープにフィルタを登録する
+
+Vue.fiflet()メソッドを使用するとグローバルスコープにフィルタが登録される
+
+グローバルスコープのフィルタはすべてのコンポーネントから共通で使用できる
+
+```js
+// 汎用的なフィルターはVue.filter()メソッドでグローバルスコープに登録し、全コンポーネントから利用できる
+Vue.filter('number_format', function(val){
+    return val.toLocaleString() + '円';
+});
+
+// Vue.filter()は、new Vue()よりも前に定義する必要があるので注意する
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        price: 10000,
+    }
+});
+```
+
+フィルタの適用
+
+```html
+<!-- {{ プロパティ名 | フィルタ名 }}でフィルタを適用できる -->
+<p>{{ price | number_format }}</p>
+```
+
+属性にフィルタを適用する
+
+```html
+<!-- v-bind:属性名="プロパティ名 | フィルタ名"でバインドしたデータにフィルタを適用できる -->
+<form action="">
+    <input type="text" name='price' v-bind:value="price | number_format">
+</form>
+```
+
+#### ローカルスコープにフィルタを登録する
+
+コンポーネントのfiltersオプションに登録したフィルタは他のコンポーネントから隠蔽される
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        price: 10000,
+    },
+    filters: {
+        local_number_format: function(val){
+            return val.toLocaleString() + '円（ローカル）';
+        }
+    }
+});
+```
+
+#### 複数のフィルタをパイプで繋ぐ
+
+```html
+<p>{{ price | number_format | unit }}</p>
+```
+
