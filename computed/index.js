@@ -1,17 +1,21 @@
-// 汎用的なフィルターはVue.filter()メソッドでグローバルスコープに登録し、全コンポーネントから利用できる
-Vue.filter('number_format', function(val){
-    return val.toLocaleString() + '円';
-});
-
-// Vue.filter()は、new Vue()よりも前に定義する必要があるので注意する
 var app = new Vue({ 
     el: '#app',
     data: {
-        price: 10000,
+        year: (new Date()).getFullYear(),
+        show: true,
     },
-    filters: {
-        local_number_format: function(val){
-            return val.toLocaleString() + '円（ローカル）';
+    methods: {
+        now1: function() {
+            return (new Date()).toLocaleString();
+        },
+    },
+    computed: {
+        // 今年が閏年か判定する算出プロパティ
+        isUrudoshi: function() {
+            return ((this.year % 4 === 0) && (this.year % 100 !== 0)) || (this.year % 400 === 0);
+        },
+        now2: function() {
+            return (new Date()).toLocaleString();
         }
-    }
+    },
 });

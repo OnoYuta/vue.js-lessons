@@ -241,3 +241,76 @@ var app = new Vue({
 <p>{{ price | number_format | unit }}</p>
 ```
 
+### 算出プロパティ
+
+コンポーネントのcomputedプロパティに算出プロパティを定義できる
+
+```html
+<p>調べたい年：<input type="text" v-model:value="year"></p>
+<p>{{ year }}年は{{ isUrudoshi ? '閏年です' : '閏年ではありません' }}</p>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        year: (new Date()).getFullYear(),
+    },
+    computed: {
+        // 今年が閏年か判定する算出プロパティ
+        isUrudoshi: function(){
+            return ((this.year % 4 === 0) && (this.year % 100 !== 0)) || (this.year % 400 === 0);
+        }
+    },
+});
+```
+
+#### 算出プロパティはキャッシュされる
+
+メソッドは描画のたびに再実行されるが算出プロパティは依存関係にあるリアクティブデータが更新されない限りキャッシュが使われる
+
+```html
+<!-- consoleからapp.show=false、app.show=trueを実行するとnow1()だけが更新される -->
+<div v-show="show">
+    <p>now1: "{{ now1() }}"</p>
+    <p>now2: "{{ now2 }}"</p>
+</div>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        show: true,
+    },
+    methods: {
+        now1: function() {
+            return (new Date()).toLocaleString();
+        },
+    },
+    computed: {
+        now2: function() {
+            return (new Date()).toLocaleString();
+        }
+    },
+});
+
+```
+
+コンソール画面で次のように実行するとnow1()だけが更新される
+
+```bash
+app.show = false
+false
+app.show = true
+true
+```
+
+```html
+now1: "2020/10/1 9:07:30"
+now2: "2020/10/1 9:07:01"
+```
+
+算出プロパティが適するケースは、たとえば商品一覧をある条件で並び替える場合など
+
+毎回商品一覧の取得からやり直すのではなく、取得した商品を使いまわして並び替えた方が無駄がない

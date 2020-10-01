@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../filter/bootstrap.css">
+    <link rel="stylesheet" href="../css/bootstrap.css">
     <script src="../js/vue.js"></script>
     <title>Introduction</title>
 </head>
 <body>
     <div class="container">
         <div id="app">
-            <!-- {{ プロパティ名 | フィルタ名 }}でフィルタを適用できる -->
-            <p class='text-info'>{{ price | number_format }}</p>
-            <!-- v-bind:属性名="プロパティ名 | フィルタ名"でバインドしたデータにフィルタを適用できる -->
-            <form action="">
-                <p>
-                    <input type="text" name='price' v-bind:value="price | number_format">
-                </p>
-            </form>
-            <p>{{ price | local_number_format }}</p>
+            <p>調べたい年：<input type="text" v-model:value="year"></p>
+            <p>{{ year }}年は{{ isUrudoshi ? '閏年です' : '閏年ではありません' }}</p>
+            <!-- 算出プロパティのキャッシュ確認 -->
+            <!-- consoleからapp.show=false、app.show=trueを実行するとnow1()だけが更新される -->
+            <div v-show="show">
+                <p>now1: "{{ now1() }}"</p>
+                <p>now2: "{{ now2 }}"</p>
+            </div>
         </div>
     </div>
     <script src="index.js"></script>
