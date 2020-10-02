@@ -314,3 +314,87 @@ now2: "2020/10/1 9:07:01"
 算出プロパティが適するケースは、たとえば商品一覧をある条件で並び替える場合など
 
 毎回商品一覧の取得からやり直すのではなく、取得した商品を使いまわして並び替えた方が無駄がない
+
+### ウォッチャ
+
+ウォッチャは、データの変更を監視して、自動的にハンドラを実行する
+
+イベントハンドリングとにているが、イベントではなく、データの変更がトリガーになる点が異なる
+
+```html
+<template v-if="stock > 0">
+    <p class="num">残り{{ stock }}個</p>
+    <p>
+        <button class="btn" v-on:click="onDeleteItem">削除</button>
+    </p>
+</template>
+<p>{{ message }}</p>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        stock: 10,
+        message: '',
+    },
+    methods: {
+        onDeleteItem: function() {
+            this.stock--;
+        },
+    },
+    watch: {
+        // 在庫が変化したとき呼び出されるハンドラ
+        // 第一引数に変化後の値、第二引数に変化前の値を受け取る
+        stock: function(newStock, oldStock) {
+            if (newStock == 0){
+                this.message = '売り切れ';
+            }
+        }
+    },
+})
+```
+
+#### ウォッチャを使うべき場面
+
+算出プロパティでも上記と同じように表示を制御することができる
+
+```html
+<template v-if="stock > 0">
+    <p class="num">残り{{ stock }}個</p>
+    <p>
+        <button class="btn" v-on:click="onDeleteItem">削除</button>
+    </p>
+</template>
+<p>{{ statusMessage }}</p>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        stock: 10,
+    },
+    methods: {
+        onDeleteItem: function() {
+            this.stock--;
+        },
+    },
+    // 算出プロパティを用いる場合
+    computed: {
+        statusMessage:function(){
+            if (this.stock == 0){
+                return '売り切れ';
+            }
+            return '';
+        },
+    }
+})
+```
+
+しかし、算出プロパティはハンドラの処理が終わるまで再描画されないので、ユーザと待たせる可能性がある
+
+- データが更新されたとき、サーバ間の通信など重い処理が発生する場合
+- ユーザの操作によって、高い頻度で処理が発生する場合
+
+上記のような場合は、Ajaxと呼ばれる非同期通信で待ち時間を短縮したり、ブラウザに重い負荷がかからないようにハンドラの実行頻度を調節できるウォッチャが適している

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script src="../js/vue.js"></script>
+    <title>Introduction</title>
+</head>
+<body>
+    <div class="container">
+        <div id="app">
+            <template v-if="stock > 0">
+                <p class="num">残り{{ stock }}個</p>
+                <p>
+                    <button class="btn" v-on:click="onDeleteItem">削除</button>
+                </p>
+            </template>
+            <p>{{ message }}</p>
+            <!-- <p>{{ statusMessage }}</p> -->
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
