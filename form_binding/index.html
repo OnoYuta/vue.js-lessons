@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script src="../js/vue.js"></script>
+    <title>Introduction</title>
+</head>
+<body>
+    <div class="container">
+        <div id="app">
+            <!-- テキストの入力 -->
+            <input type="text" name="text" v-model="yearNormal">
+            <p>通常のバインド：{{ yearNormal }}</p>
+            <!-- 全角文字をリアルタイムで反映させる方法 -->
+            <input type="text" name="text" v-on:input="yearInputHandler" v-bind:value='year'>
+            <p>全角文字もリアルアイムで反映：{{ year }}</p>
+            <!-- テキストエリアの入力 -->
+            <textarea name="textarea" v-model="message"></textarea>
+            <pre>入力内容：{{ message }}</pre>
+            <!-- 単体のチェックボックス -->
+            <p>ケーキはお好きですか？：{{ answer }}</p>
+            <input type="checkbox" id="cake" v-model="answer" true-value="はい" false-value="いいえ">
+            <label for="cake">チェックしてください</label>
+            <!-- 複数のチェックボックス -->
+            <!-- グループに対して1つのプロパティをバインドする -->
+            <p>ご注文をお選びください:{{ selection }}</p>
+            <label>
+                <input type="checkbox" v-model="answers" value="ケーキ">ケーキ
+            </label>
+            <label>
+                <input type="checkbox" v-model="answers" value="紅茶">紅茶
+            </label>
+            <label>
+                <input type="checkbox" v-model="answers" value="コーヒー">コーヒー
+            </label>
+            <!-- ラジオボタン -->
+            <p>当店のサービスはいかがでしたか？：{{ radio_answer }}</p>
+            <label>
+                <input type="radio" v-model="radio_answer" value="素晴らしい">素晴らしい
+            </label>
+            <label>
+                <input type="radio" v-model="radio_answer" value="普通">普通
+            </label>
+            <label>
+                <input type="radio" v-model="radio_answer" value="まだまだ">まだまだ
+            </label>
+            <!-- 単数選択のセレクトボックス -->
+            <p>当店のご利用頻度は？：{{ select_answer }}</p>
+            <select v-model="select_answer">
+                <option value="初めて">初めて</option>
+                <option value="週一回以上">週一回以上</option>
+                <option value="月2回以上">月2回以上</option>
+                <option value="半年に一回">半年に一回</option>
+            </select>
+            <!-- 複数選択のセレクトボックス -->
+            <p>分類：{{ selectedCategory }}</p>
+            <select v-model="category" multiple>
+                <option value="宿泊費">宿泊費</option>
+                <option value="食費">食費</option>
+                <option value="交通費">交通費</option>
+            </select>
+            <!-- セレクトボックスの選択肢にバインドする -->
+            <p>当店のご利用頻度は？：{{ option_bind_answer }}</p>
+            <select v-model="option_bind_answer">
+                <option disabled value="">選択してください</option>
+                <option v-for="item in options" v-bind:value="item.label" v-bind:key="item.code">
+                    {{ item.label }}
+                </option>
+            </select>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

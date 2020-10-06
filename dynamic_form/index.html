@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.css">
+    <script src="../js/vue.js"></script>
+    <title>Introduction</title>
+</head>
+<body>
+    <div class="container">
+        <!-- 動的な選択肢 -->
+        <div id="app">
+            <!-- カテゴリの選択 -->
+            <p>selected category: {{ selectedCategory.name }}</p>
+            <select name="category" v-model="selectedCategoryId">
+                <option value="" disabled>選択してください</option>
+                <option v-for="category in categories" v-bind:value="category.id" v-bind:key="category.id">
+                    {{ category.name }}
+                </option>
+            </select>
+            <!-- アイテムの選択 -->
+            <template v-if="filteredItems">
+                <p>selected item: {{ selectedItem.name }}</p>
+                <select name="item" v-model="selectedItemId">
+                    <option value="" disabled>選択してください</option>
+                    <option v-for="item in filteredItems" v-bind:value="item.id" v-bind:key="item.id">
+                        {{ item.name }}
+                    </option>
+                </select>
+            </template>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

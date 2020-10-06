@@ -398,3 +398,286 @@ var app = new Vue({
 - ユーザの操作によって、高い頻度で処理が発生する場合
 
 上記のような場合は、Ajaxと呼ばれる非同期通信で待ち時間を短縮したり、ブラウザに重い負荷がかからないようにハンドラの実行頻度を調節できるウォッチャが適している
+
+### フォーム入力バインディング
+
+フォーム入力をバインドする場合はv-modelディレクティブを使う
+
+```html
+<input type="text" name="text" v-model="year">
+<p>{{ year }}</p>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        year: (new Date().getFullYear()),
+    },
+})
+```
+
+HTMLのフォームコントロールには通常value属性やchecked属性、selected属性が使われる
+
+しかしv-modelを指定したフォームコントロールではそれらの設定値が無視される
+
+そのため、コンポーネント側のdataオプションで初期値を設定しておく必要がある
+
+#### 全角文字をリアルタイムで反映させる
+
+v-modelを使う方法は、全角文字を入力する場合はエンターを押すまで変更が反映されない
+
+全角文字でもキー入力ごとにデータに反映させるには下記のようにイベントハンドラを用いる
+
+```html
+<input type="text" name="text" v-on:input="yearInputHandler" v-bind:value='year'>
+<p>{{ year }}</p>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        year: (new Date().getFullYear()),
+    },
+    methods: {
+        // yearのinputイベントハンドラ
+        yearInputHandler: function($event){
+            this.year = $event.target.value;
+        }
+    }
+})
+```
+
+#### チェックボックスのバインド
+
+チェックボックスにバインドされるデータの型は、選択肢が単体か複数かで異なる
+
+* 単体のチェックボックスの場合は真偽値
+* 複数のチェックボックスの場合は文字列の配列
+
+単体のチェックボックスの場合
+
+```html
+<p>ケーキはお好きですか？：{{ answer }}</p>
+<input type="checkbox" id="cake" v-model="answer" true-value="はい" false-value="いいえ">
+<label for="cake">チェックしてください</label>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        answer: 'はい',
+    },
+})
+```
+
+複数のチェックボックス
+
+```html
+<!-- グループに対して1つのプロパティをバインドする -->
+<p>ご注文をお選びください:{{ selection }}</p>
+<label>
+    <input type="checkbox" v-model="answers" value="ケーキ">ケーキ
+</label>
+<label>
+    <input type="checkbox" v-model="answers" value="紅茶">紅茶
+</label>
+<label>
+    <input type="checkbox" v-model="answers" value="コーヒー">コーヒー
+</label>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        answers: [],
+    },
+    computed: {
+        selection: function() {
+            return this.answers.join();
+        }
+    }
+})
+```
+
+#### ラジオボラン
+
+ラジオボタンは1つしか選択できないためプロパティは配列ではなく文字列型
+
+```html
+<p>当店のサービスはいかがでしたか？：{{ radio_answer }}</p>
+<label>
+    <input type="radio" v-model="radio_answer" value="素晴らしい">素晴らしい
+</label>
+<label>
+    <input type="radio" v-model="radio_answer" value="普通">普通
+</label>
+<label>
+    <input type="radio" v-model="radio_answer" value="まだまだ">まだまだ
+</label>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        radio_answer: '選択してください'
+    },
+})
+```
+
+#### セレクトボックス
+
+単数選択の場合
+
+```html
+<p>当店のご利用頻度は？：{{ select_answer }}</p>
+<select v-model="select_answer">
+    <option value="初めて">初めて</option>
+    <option value="週一回以上">週一回以上</option>
+    <option value="月2回以上">月2回以上</option>
+    <option value="半年に一回">半年に一回</option>
+</select>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        select_answer: '',
+    },
+})
+```
+
+複数選択の場合
+
+```html
+<p>分類：{{ selectedCategory }}</p>
+<select v-model="category" multiple>
+    <option value="宿泊費">宿泊費</option>
+    <option value="食費">食費</option>
+    <option value="交通費">交通費</option>
+</select>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        category: [],
+    },
+    computed: {
+        selectedCategory: function() {
+            return this.category.length > 0 ? this.category.join() : '';
+        }
+    }
+})
+```
+
+セレクトボックスの選択肢にバインドする
+
+```html
+<!-- セレクトボックスの選択肢にバインドする -->
+<p>当店のご利用頻度は？：{{ option_bind_answer }}</p>
+<select v-model="option_bind_answer">
+    <option disabled value="">選択してください</option>
+    <option v-for="item in options" v-bind:value="item.label" v-bind:key="item.code">
+        {{ item.label }}
+    </option>
+</select>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        option_bind_answer: '',
+        options: [
+            {code: 'ans1', label: '初めて'},
+            {code: 'ans2', label: '週一回'},
+            {code: 'ans3', label: '月2回'},
+            {code: 'ans4', label: '半年に一回'},
+        ],
+    },
+})
+```
+
+ある項目の選択により別の項目の選択肢が動的に変化するセレクトボックス
+
+```html
+<!-- 動的な選択肢 -->
+<div id="app">
+    <!-- カテゴリの選択 -->
+    <p>selected category: {{ selectedCategory.name }}</p>
+    <select name="category" v-model="selectedCategoryId">
+        <option value="" disabled>選択してください</option>
+        <option v-for="category in categories" v-bind:value="category.id" v-bind:key="category.id">
+            {{ category.name }}
+        </option>
+    </select>
+    <!-- アイテムの選択 -->
+    <template v-if="filteredItems">
+        <p>selected item: {{ selectedItem.name }}</p>
+        <select name="item" v-model="selectedItemId">
+            <option value="" disabled>選択してください</option>
+            <option v-for="item in filteredItems" v-bind:value="item.id" v-bind:key="item.id">
+                {{ item.name }}
+            </option>
+        </select>
+    </template>
+</div>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        selectedCategoryId: '',
+        categories: [
+            {id: 'cg1', name: '和食'},
+            {id: 'cg2', name: '中華'},
+            {id: 'cg3', name: 'イタリアン'},
+            {id: 'cg4', name: 'フレンチ'},
+        ],
+        selectedItemId: '',
+        items: [
+            {id: 'it1', categoryId: 'cg1', name: '寿司'},
+            {id: 'it2', categoryId: 'cg1', name: 'そば'},
+            {id: 'it3', categoryId: 'cg1', name: '天ぷら'},
+            {id: 'it4', categoryId: 'cg2', name: 'ラーメン'},
+            {id: 'it5', categoryId: 'cg2', name: '餃子'},
+            {id: 'it6', categoryId: 'cg2', name: '青椒肉絲'},
+            {id: 'it7', categoryId: 'cg3', name: 'マルゲリータピザ'},
+            {id: 'it8', categoryId: 'cg3', name: 'ナポリタン'},
+            {id: 'it9', categoryId: 'cg4', name: 'キッシュ'},
+        ]
+    },
+    methods: {
+    },
+    computed: {
+        selectedCategory: function (){
+            // findメソッドで、idが一致する最初のカテゴリを取得する
+            let category = this.categories.find(category => category.id === this.selectedCategoryId);
+
+            // アイテムが選択された後にカテゴリを再選択した場合はアイテムをリセットする
+            this.selectedItemId = '';
+
+            return category ? category : {id: '', name: '未選択'};
+        },
+        filteredItems: function (){
+            // filterメソッドで、カテゴリidの一致するすべてのアイテムを取得する
+            let found = this.items.filter(item => item.categoryId === this.selectedCategoryId);
+
+            return found ? found : null;
+        },
+        selectedItem: function (){
+            let item = this.items.find(item => item.id === this.selectedItemId);
+            
+            return item ? item : {id: '', name: '未選択'};
+        },
+    }
+})
+```
