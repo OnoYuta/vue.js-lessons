@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  app:
+    build: ./infra/php
+    volumes:
+      - "./${WORK_DIR}:/work"
