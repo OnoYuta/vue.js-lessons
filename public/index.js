@@ -76,13 +76,11 @@ let app = new Vue({
             return items;
         },
         getItems: function() {
-            let url = './server/items.js';
+            let url = 'http://127.0.0.1/index.php';
             $.ajax({
                 url: url,
                 type: "GET",
-                dataType: 'jsonp',
-                jsonp: 'callback', // クエリパラメータの名前
-                jsonpCallback: 'items', // コールバック関数の名前
+                dataType: 'json',
             }).done(function(data, textStatus, jqXHR) {
                 console.log('通信が成功しました');
                 // bind()でthisの参照するオブジェクトをvueに指定する
