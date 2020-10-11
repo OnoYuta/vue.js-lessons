@@ -24,5 +24,6 @@ while ($row = $prepare->fetch(PDO::FETCH_ASSOC)) {
 $data = json_encode($items, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 // JSONを出力
-header("Content-Type: applicarion/json");
+header("Content-Type: application/json");
+// header('Content-Disposition: attachment; filename="data.json"');
 echo $data;

@@ -76,7 +76,7 @@ let app = new Vue({
             return items;
         },
         getItems: function() {
-            let url = 'http://127.0.0.1/index.php';
+            let url = 'http://localhost/index.php';
             $.ajax({
                 url: url,
                 type: "GET",
