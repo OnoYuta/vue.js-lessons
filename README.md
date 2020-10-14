@@ -1,7 +1,9 @@
 # vue.js-lessons
 To learn basic operations of Vue.js.
 
-## Vue.jsを学ぶメリット
+## Vue.jsとは
+
+### 学ぶメリット
 
 フレームワークを使うメリット
 
@@ -29,7 +31,7 @@ Vue.jsにより煩雑なDOM操作から解放される
 >
 > ツリーの節に相当するHTML要素のことをノードと呼ぶ。
 
-## Vue.jsの機能概要
+### Vue.jsの機能概要
 
 Vue.jsの機能は下記のとおりだが、主要な機能は次の2つに大別できる。
 
@@ -66,9 +68,11 @@ ViewModelは、Viewから受け取った入力情報をModelに伝え、Modelか
 
 ViewModelはMVCモデルのControllerに似ているが、**Controllerは描画処理に介入しないのに対し、ViewModelはデータバインディングを通してModelとViewを自動的に結びつける点が異なる**。
 
+## 書式
+
 ### コンポーネント
 
-コンポーネントとは、Vue.jsにおける単体のオブジェクトを指す。
+**コンポーネントとは、Vue.jsにおける単体のオブジェクトを指す**。
 
 ```javascript
 // あらかじめ定義されているVueもコンポーネントの一種
@@ -127,6 +131,16 @@ HTMLテキスト内にマスタッシュで囲んでプロパティ名を記述�
 ```html
 <!-- v-bind:class="{class名: calss名を出力する条件式}"でクラスをバインドする -->
 <p v-bind:class="{capitalize: isCapital}">hello vue!</p>
+```
+
+#### HTMLタグをそのまま出力する
+
+```js
+name: 'Michael<br>スマホケース',
+```
+
+```html
+<p v-html='item.name'></p>
 ```
 
 #### 配列を出力する
@@ -314,6 +328,123 @@ now2: "2020/10/1 9:07:01"
 算出プロパティが適するケースは、たとえば商品一覧をある条件で並び替える場合など
 
 毎回商品一覧の取得からやり直すのではなく、取得した商品を使いまわして並び替えた方が無駄がない
+
+### イベントハンドリング
+
+ボタンやリンクのクリックやページのスクロールといったユーザの操作をイベントと呼ぶ
+
+イベントの発生をプログラムで検知して何らかの処理を実行することをイベントハンドラと呼ぶ
+
+#### ボタンクリックによって在庫が減らす
+
+```html
+<template v-if="stock > 0">
+    <p class="num">残り{{ stock }}個</p>
+    <button class="btn" v-on:click="onDeleteItem">削除</button>
+</template>
+<template v-else>
+    <p>在庫切れ</p>
+</template>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        stock: 10,
+    },
+    methods: {
+        onDeleteItem: function() {
+            this.stock--;
+        },
+    },
+});
+```
+
+#### コンポーネント外部のイベントハンドリング
+
+v-onディレクティブでイベントハンドラを登録できるのはコンポーネントのスコープ内にある要素に限られる
+
+次のようなウィンドウ自体に発生するイベントはv-onでは検知することができない
+
+* load：ページが読み込まれた時に発生する
+* resize：ウィンドウサイズが変更された時に発生する
+* scroll：ページをスクロールさせた時に発生する
+
+上記はVueは使わずaddEventLisner関数でイベントハンドラに登録する必要がある
+
+登録するタイミングは早いほうが良く、コンポーネントのcreatedプロパティなどを使用する
+
+Vueを介さずに登録したイベントハンドラはremoveEventListener関数で明示的に解除する必要がある
+
+```html
+<p>ウィンドウの横幅：{{ width }}</p>
+<p>ウィンドウの高さ：{{ height }}</p>
+```
+
+```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+    },
+  	// コンポーネント作成時にイベントハンドラを登録する
+    created: function() {
+        addEventListener('resize', this.resizeHandler);
+    },
+  	// コンポーネント破棄時にイベントハンドラを解除する
+    beforeDestory: function() {
+        removeEventListener('resize', this.resizeHandler);
+    },
+    methods: {
+        resizeHandler: function($event) {
+            this.width = $event.target.innerWidth;
+            this.height = $event.target.innerHeight;
+        },
+    },
+});
+```
+
+#### イベントに引数を渡す
+
+イベントが発生すると、ブラウザはイベントオブジェクトを生成する
+
+イベントオブジェクトにはDOMノードそのものを示すtargetオブジェクトなどが含まれる
+
+Vueでは、$eventという変数名でイベントオブジェクトを受け取る
+
+#### マウスカーソル位置の取得
+
+```html
+<p>ウィンドウの横幅：{{ width }}</p>
+<p>ウィンドウの高さ：{{ height }}</p>
+<p>マウスカーソルの位置：{{ point.x }}, {{ point.y }}</p>
+```
+
+ ```js
+var app = new Vue({ 
+    el: '#app',
+    data: {
+        point: {
+            x: 0,
+            y: 0,
+        },
+    },
+    created: function() {
+        addEventListener('mousemove', this.mousemoveHnadler);
+    },
+    beforeDestory: function() {
+        removeEventListener('mousemove', this.mousemoveHnadler);
+    },
+    methods: {
+        mousemoveHnadler:function($event){
+            this.point.x = $event.clientX;
+            this.point.y = $event.clientY;
+        }
+    },
+})
+ ```
 
 ### ウォッチャ
 
@@ -552,6 +683,23 @@ var app = new Vue({
 })
 ```
 
+単数選択でvalueを数値にしたい場合(.number修飾子を使う)
+
+```html
+<li class="nav-item">
+    <label for="sort">並び替え</label>
+    <select id="sort" class="sorting" v-model.number='sortOrder'>
+        <option value="1">標準</option>
+        <option value="2">価格が安い順</option>
+    </select>
+</li>
+```
+
+```js
+// 並び替え方法（1:標準、2:価格が安い順）
+sortOrder: 1,
+```
+
 複数選択の場合
 
 ```html
@@ -681,3 +829,704 @@ var app = new Vue({
     }
 })
 ```
+
+## Ajax
+
+Ajaxは、Asynchronous JavaScript + XMLの略で、JavaScriptとXMLを用いた非同期通信アプローチのこと
+
+### 同期通信と非同期通信の違い
+
+**同期通信**
+
+- データや処理をリクエストしてから、レスポンスが返ってくるまでプログラムを一時停止する
+- 複数の処理を順序正しく実装しなければならないケースに適する
+
+**非同期通信**
+
+- アプリケーションのメインロジックと外部との通信を並行して実行する
+- サーバのレスポンスを待つ必要がないのでユーザを待たせなくて済む
+
+JavaScriptはマウスオーバやクリックなどのイベントを検知することができる
+
+そのため、それらをトリガーに非同期通信を開始してDOMを操作する窓口として利用される
+
+### XMLとは
+
+XMLは、Extensible Markup Languageの略で、HTMLと同じマークアップ言語のひとつ
+
+#### データの意味がわかりやすい
+
+マークアップの記述に使われるタグ`<xxx>`の「xxx」を要素という
+
+XMLでは要素名を自由につけることができる
+
+```xml
+新しいオフィスは<住所>東京都渋谷区〇〇</住所>です。
+```
+
+上記のような記述が可能なので、該当するデータを検索しやすくなる
+
+#### アプリケーション間のデータ交換に用いられる
+
+XMLは階層構造や要素名を自由に定義できるため、データの管理に適している
+
+テキストファイルとして手軽にデータ交換を行うことができ、そのままデータの格納が可能
+
+CSVなども汎用的だが階層構造を表現することができないためXMLが使用される
+
+#### XMLとHTMLの違い
+
+両者は似ているが、HTMLがウェブページを記述するための言語であるのに対し、XMLはデータの意味や階層を文章で表現するための言語であるため、用途が全く異なる
+
+XMLでデータを格納した後、HTMLに変換して表示するといったことも可能
+
+### JSONとは
+
+JSONは、JavaScript Object Notationの略で、JavaScriptのオブジェクト表記を用いたデータ形式
+
+マークアップ言語のように閉じタグが不要なので、XMLよりも簡潔に記述することができる
+
+**XMLで記述する例**
+
+```xml
+<item>
+    <id>1</id>
+    <name>商品A</name>
+    <price>1000</price>
+</item>
+```
+
+**JSONで記述する例**
+
+```json
+{
+    "item": {
+        "id": 1,
+        "name": "商品A",
+        "price": 1000
+    }
+}
+```
+
+#### JSONの用途
+
+JSONはeval()関数でJavaScriptオブジェクトに変換することができる
+
+そのためAjaxでのデータ交換フォーマットとしてXMLの代わりに広く利用される
+
+主要なプログラミング言語にはJSONの生成や読み込みのためのライブラリが存在する
+
+#### JSON表記のルール
+
+- 文字コードはUTF-8を使用する
+- 文字列はすべてダブルクォート`"`で囲む
+- 配列の最後の要素の後ろにはカンマ`,`はつけない
+
+### クロスドメイン制約とは
+
+CORSはCross-Origin Resource Sharingの略で、ブラウザがオリジン以外の場所からデータを取得すること
+
+オリジンは、HTMLを読み込んだサーバの下記の情報の組み合わせで識別する
+
+- プロトコルスキーム：http://, https://, file://など
+- ホスト名：amazon.co.jpなど
+- ポート番号：80, 8080など
+
+ブラウザは原則として異なるオリジン以外の場所かデータを取得することを禁止している
+
+ローカルPC上のファイルにアクセスする際はfileプロトコルが使われる
+
+そのため、XMLHttpRequestを用いてhttpプロトコルでアクセスしようとするとエラーが発生する
+
+このセキュリティ上の制約をクロスドメイン制約と呼ぶ
+
+### jQueryでAjaxを利用する例
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商品一覧</title>
+</head>
+<body>
+    <!-- 読み込みボタン -->
+    <button id="load">読み込み</button>
+    <div class="container">
+        <!-- 結果を表示するための領域 -->
+        <div id="result" class="row"></div>
+    </div>
+    <!-- jQueryのCDNを読み込む -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="index.js"></script>
+</body>
+</html>
+```
+
+index.js
+
+```js
+$('#load').on('click', function(event) {
+    // 通信をになうXMLHttpRequestオブジェクトのインスタンスを生成する
+    $.ajax({
+        url: './server/items.json',
+        type: 'GET',
+        dataType: 'json'
+    }).done(function (data, textStatus, jqXHR) {
+        // 通信が成功したとき
+        console.log('通信が成功しました');
+        updateScreen(data);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        // 通信が失敗したとき
+        console.log('通信が失敗しました');
+    });
+});
+
+// 取得した商品情報を描画する
+function updateScreen(items) {
+    // 商品リストのノードをすべて削除する
+    $('#result').empty();
+
+    // 商品の子ノードをDOMに挿入する
+    let list = '';
+    for(let i = 0; i < items.length; i++) {
+        list += '<div class="col-md-4">';
+        list += '<div class="position-relative">';
+        list += '<div class="sale">SALE</div>';
+        list += '<img src="' + items[i].image + '" alt="">';
+        list += '</div>';
+        list += '<div class="text-center">';
+        list += '<p>' + items[i].name + '</p>';
+        list += '</div>';
+        list += '<div class="text-center">';
+        list += '<div class="price"><span class="bold h3">' + items[i].price + '</span>円（税込）</div>';
+        list += '<div class="shipping-fee">+送料' + items[i].delv + '円</div>';
+        list += '</div>';
+        list += '</div>';
+    }
+
+    $('#result').append(list);
+}
+```
+
+### Vue.jsでAjaxを利用する例
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    data: {
+        items: [],
+        isError: false,
+        message: '',
+    },
+    methods: {
+        getItems: function() {
+            let url = './server/items.js';
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: 'jsonp',
+                jsonp: 'callback', // クエリパラメータの名前
+                jsonpCallback: 'items', // コールバック関数の名前
+            }).done(function(data, textStatus, jqXHR) {
+                console.log('通信が成功しました');
+                // bind()でthisの参照するオブジェクトをvueに指定する
+                this.items = data;
+            }.bind(this)).fail(function(jqXHR, textStatus, errorThrown) {
+                console.log('通信が失敗しました');
+                this.isError = true;
+                this.message = '商品の取り込みに失敗しました。';
+            }.bind(this));
+        }
+    },
+    created: function() {
+        this.getItems();
+    }
+});
+
+```
+
+./server/items.js
+
+```js
+items([
+    {
+        "id": 1,
+        "name": "Michael<br>スマホケース",
+        "price": 1580,
+        "image": "images/01.jpg",
+        "delv": 0,
+        "isSale": true
+    },
+    {
+        "id": 2,
+        "name": "Raphael<br>スマホケース",
+        "price": 1580,
+        "image": "images/02.jpg",
+        "delv": 0,
+        "isSale": true
+    },
+    {
+        "id": 3,
+        "name": "Gabriel<br>スマホケース",
+        "price": 1580,
+        "image": "images/03.jpg",
+        "delv": 240,
+        "isSale": true
+    },
+    {
+        "id": 4,
+        "name": "Uriel<br>スマホケース",
+        "price": 980,
+        "image": "images/04.jpg",
+        "delv": 0,
+        "isSale": false
+    },
+    {
+        "id": 5,
+        "name": "Ariel<br>スマホケース",
+        "price": 980,
+        "image": "images/05.jpg",
+        "delv": 0,
+        "isSale": false
+    },
+    {
+        "id": 6,
+        "name": "Azrael<br>スマホケース",
+        "price": 1580,
+        "image": "images/06.jpg",
+        "delv": 0,
+        "isSale": false
+    }
+]);
+```
+
+## コンポーネント
+
+### グローバルスコープにコンポーネントを登録
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../js/vue.js"></script>
+    <title>Introduction</title>
+</head>
+<body>
+    <div id="app">
+        <p>↓ここにコンポーネントが入る</p>
+        <show-hello></show-hello>
+    </div>
+    <!-- Vue.component()などのグローバルメソッドはnew Vue()より先に実行する必要がある -->
+    <script src="show-hello.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
+```
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+});
+```
+
+show-hellp.js
+
+```js
+Vue.component('show-hello', {
+    // テンプレート内で改行したい場合はバッククォートで囲む
+    template: `
+    <p>
+    {{ message }}
+    </p>
+    `,
+    // オブジェクトを返す関数として定義する必要がある
+    data: function(){
+        return {
+            message: 'hello vue!!'
+        }
+    }
+});
+```
+
+### ローカルスコープにコンポーネントを登録
+
+親コンポーネントのcomponentオプションに子コンポーネントを定義するとローカルスコープとなる
+
+index.html
+
+```html
+<body>
+    <div id="app">
+        <!-- このコンポーネントは描画される -->
+        <my-component></my-component>
+    </div>
+    <div id="app2">
+        <!-- このコンポーネントは描画されない -->
+        <my-component></my-component>
+    </div>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+```
+
+my-component.js
+
+```js
+let myComponent = {
+    template: `
+    <p>
+    {{ message }}
+    </p>
+    `,
+    data: function(){
+        return {
+            message: '子コンポーネント',
+        }
+    }
+};
+```
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    components: {
+        'my-component': myComponent,
+    }
+});
+```
+
+### 親コンポーネントから子コンポーネントに値を渡す
+
+子コンポーネントが値を受け取るためには次のような手順をとる
+
+- 子コンポーネントが受け取るデータのプロパティ名をpropsオプションに定義する
+- 親のテンプレートで子コンポーネントのカスタムタグ内に属性を追加する
+
+my-component.js
+
+```js
+let myComponent = {
+    template: `
+    <div>
+        <span>{{name}}</span>:<span>{{price}}(円)</span>
+    </div>
+    `,
+    // 子コンポーネントにpropsプロパティを追加する
+    props: [
+        'name',
+        'price'
+    ]
+};
+```
+
+親コンポーネントのカスタムタグに属性として値を登録する
+
+index.html
+
+```html
+<body>
+    <div id="app">
+      	<!-- 定義したプロパティ名で値を渡す -->
+        <my-component name="スマホケースA" price="980"></my-component>
+        <my-component name="スマホケースB" price="1580"></my-component>
+    </div>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+```
+
+### リアクティブなデータを渡す
+
+親コンポーネントに定義したデータをカスタムタグ内にバインドすることもできる
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    data: {
+        name: 'スマホケース',
+        price: 980,
+    },
+    components: {
+        'my-component': myComponent,
+    }
+});
+```
+
+index.html
+
+```html
+<body>
+    <div id="app">
+        <my-component name="スマホケースA" price="980"></my-component>
+        <my-component name="スマホケースB" price="1580"></my-component>
+        <my-component v-bind:name="name" v-bind:price="price"></my-component>
+    </div>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+```
+
+my-component.js
+
+```js
+let myComponent = {
+    template: `
+    <div>
+        <span>{{name}}</span>:<span>{{price}}(円)</span>
+    </div>
+    `,
+    props: [
+        'name',
+        'price'
+    ]
+};
+```
+
+### 子コンポーネントから親コンポーントに値を渡す
+
+子から親のテンプレートは見えないので属性を介して渡すことはできない
+
+そのため、子から親に値を渡すときは次のようにする
+
+- 親は子からデータを受け取るためのイベントハンドラを用意する
+- 子は親にデータを渡したいタイミングでイベントハンドラを呼び出す
+
+my-component.js
+
+```js
+let myComponent = {
+    // ボタンがクリックされたらclickHndlerを呼び出す
+    template: `
+    <div>
+        <button v-on:click="clickHndler">値下げをする</button>
+        <span>{{name}}</span>:<span>{{price}}(円)</span>
+    </div>
+    `,
+    props: [
+        'name',
+        'price'
+    ],
+    methods: {
+        // ボタンのクリックイベントハンドラを定義する
+        clickHndler: function() {
+            // 子コンポーネントにchild-clickイベントを発生させる
+            this.$emit('child-click');
+        }
+    }
+};
+```
+
+index.html
+
+```html
+<body>
+    <div id="app">
+        <!-- 親テンプレート内でchild-clickイベントが発生したときのイベントハンドラを割り当てる -->
+        <my-component v-on:child-click="priceDown" v-bind:name="name" v-bind:price="price"></my-component>
+    </div>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+```
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    data: {
+        name: 'スマホケース',
+        price: 980,
+    },
+    components: {
+        'my-component': myComponent,
+    },
+    methods: {
+        priceDown: function() {
+            this.price = Math.max(this.price - 100, 0);
+        }
+    }
+});
+```
+
+クリックのたびに値下げする金額を子コンポーネント側で指定する
+
+1. 500円以上の商品はクリックのたびに50円値下げする
+2. 500円までしか値下げしない
+
+my-component.js
+
+```js
+let myComponent = {
+    // ボタンがクリックされたらclickHndlerを呼び出す
+    template: `
+    <div>
+        <button v-on:click="clickHndler">値下げをする</button>
+        <span>{{name}}</span>:<span>{{price}}(円)</span>
+    </div>
+    `,
+    props: [
+        'name',
+        'price'
+    ],
+    methods: {
+        clickHndler: function() {
+            // 値引き金額を子コンポーネント側で定義する
+            let discount = this.price - 50 > 500 ? 50 : this.price - 500;
+
+            // $emit()の第二引数で値引き金額を渡す
+            this.$emit('child-click', discount);
+        }
+    }
+```
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    data: {
+        name: 'スマホケース',
+        price: 980,
+    },
+    components: {
+        'my-component': myComponent,
+    },
+    methods: {
+        // priceDownの引数に値引き金額を追加する
+        priceDown: function(discount) {
+            // 値引き金額が指定されなかったときは100円とする
+            if(discount === undefined) {
+                discount = 100;
+            }
+
+            this.price -= discount;
+        }
+    }
+});
+```
+
+### .native修飾子でコンポーネントのイベントを検知する
+
+通常はコンポーネントのカスタムタグは`v-on:click="handler"`と記述しただけではイベントが発生しない
+
+```html
+<div id="app">
+    <!-- 子コンポーネントをクリックしてもpriceDownメソッドは実行されない -->
+    <my-component v-on:click="priceDown" v-bind:price="price"></my-component>
+</div>
+```
+
+しかしv-onディレクティブに,native修飾子を併用すると、子コンポーネントのどこをクリックしてもイベントが発生するようになる
+
+index.html
+
+```html
+<body>
+    <div id="app">
+        <!-- 子コンポーネントをクリックするとイベントが発生する -->
+        <my-component v-on:click.native="priceDown" v-bind:price="price"></my-component>
+    </div>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+```
+
+my-component.js
+
+```js
+let myComponent = {
+    // 子コンポーネントにイベント（$emit）を定義する必要はない
+    template: `<span>現在の価格：{{price}}(円)</span>`,
+    props: ['price'],
+};
+```
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    data: {
+        name: 'スマホケース',
+        price: 980,
+    },
+    components: {
+        'my-component': myComponent,
+    },
+    methods: {
+        priceDown: function() {
+            this.price = Math.max(this.price - 50, 500);
+        }
+    }
+});
+```
+
+このように.native修飾子を使うことで、親はこの実装を知らなくてもイベントハンドリングを行うことができる
+
+ただし、子コンポーネントの特定の要素にだけイベントを発生させたい場合にはこの方法は使えない
+
+### コンポーネントを繰り返し描画する
+
+親のコンポーネントに商品の配列を定義する
+
+index.js
+
+```js
+let app = new Vue({
+    el: '#app',
+    data: {
+        items: [
+            {id: 1, name: 'スマホケース1', price: 980},
+            {id: 2, name: 'スマホケース2', price: 980},
+            {id: 3, name: 'スマホケース3', price: 1580},
+            {id: 4, name: 'スマホケース4', price: 1580},
+            {id: 5, name: 'スマホケース5', price: 1580},
+            {id: 6, name: 'スマホケース6', price: 980},
+        ]
+    },
+    components: {
+        'my-component': myComponent,
+    },
+});
+```
+
+my-component.js
+
+```js
+let myComponent = {
+    template: `<li>{{id}} {{name}} {{price}}(円)</li>`,
+    props: ['id', 'name', 'price'],
+};
+```
+
+index.html
+
+```html
+<body>
+    <div id="app">
+        <!-- 下記のようにオブジェクトをv-bindするとプロパティを一括でバインドすることができる -->
+        <my-component v-for="item in items"　v-bind="item" v-bind:key="item.id"></my-component>
+        <!-- プロパティをひとつずつバインドする場合は下記のように記述する -->
+        <my-component v-for="item in items" v-bind:id="item.id" v-bind:name="item.name" v-bind:price="item.price" v-bind:key="item.id"></my-component>
+    </div>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+```
+

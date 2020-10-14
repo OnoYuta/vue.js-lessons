@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../js/vue.js"></script>
+    <title>Introduction</title>
+</head>
+<body>
+    <div id="app">
+        <show-hello></show-hello>
+        <!-- 下記のようにオブジェクトをv-bindするとプロパティを一括でバインドすることができる -->
+        <ul>
+            <my-component v-for="item in items" v-on:click.native="priceDown" v-bind="item" v-bind:key="item.id"></my-component>
+        </ul>
+        <!-- プロパティをひとつずつバインドする場合は下記のように記述する -->
+        <ul>
+            <my-component v-for="item in items" v-on:click.native="priceDown" v-bind:id="item.id" v-bind:name="item.name" v-bind:price="item.price" v-bind:key="item.id"></my-component>
+        </ul>
+    </div>
+    <script src="show-hello.js"></script>
+    <script src="my-component.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
