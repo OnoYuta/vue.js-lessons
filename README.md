@@ -1,6 +1,3 @@
-# vue.js-lessons
-To learn basic operations of Vue.js.
-
 ## Vue.jsとは
 
 ### 学ぶメリット
